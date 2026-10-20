@@ -15,7 +15,7 @@ var interact_ray: RayCast3D
 var floor_ray: RayCast3D
 
 var mouse_sens := 1.0
-var touch_sens := 1.0
+var touch_sens := 0.4
 var look_sens := 0.0022
 var touch_look_delta := Vector2()
 var touch_move := Vector2()
@@ -82,7 +82,7 @@ func _ready() -> void:
 	add_child(floor_ray)
 
 	mouse_sens = float(AudioMgr.get_setting("sensitivity", 1.0))
-	touch_sens = float(AudioMgr.get_setting("touch_sens", 1.0))
+	touch_sens = float(AudioMgr.get_setting("touch_sens", 0.4))
 
 func _unhandled_input(event: InputEvent) -> void:
 	if GameState.ui_open:

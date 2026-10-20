@@ -318,7 +318,7 @@ func _ground_walls() -> void:
         var p: StandardMaterial3D = mats["plaster"]
         var pb: StandardMaterial3D = mats["brick"]
         # outer perimeter (compound)
-        _wall(-11, 9, 11, 9, pb, WALL_H, 0, [{"c": 5 + 11, "w": 1.1, "y0": 0, "y1": 2.2}])       # south (main door at x=0)
+        _wall(-11, 9, 11, 9, pb, WALL_H, 0, [{"c": 0 + 11, "w": 1.1, "y0": 0, "y1": 2.2}])       # south (main door gap at x=0, aligned with main_door)
         _wall(-11, -9, 11, -9, p)                                                                  # north
         _wall(-11, -9, -11, 9, p)                                                                  # west
         _wall(11, -9, 11, 9, p)                                                                    # east
@@ -332,10 +332,10 @@ func _ground_walls() -> void:
         _wall(-2.9, 4.3, -2.9, 9, p)
         _wall(2.9, 4.3, 2.9, 9, p)
         # west wing: courtyard side x=-5.2 (door at z=0), kitchen/study divider x=-7.2 (doors z=-2, z=2)
-        _wall(-5.2, -4, -5.2, 4.3, p, WALL_H, 0, [{"c": 4 + 4.3, "w": 1.1, "y0": 0, "y1": 2.15}])
+        _wall(-5.2, -4, -5.2, 4.3, p, WALL_H, 0, [{"c": 0 + 4, "w": 1.1, "y0": 0, "y1": 2.15}])
         _wall(-7.2, -4, -7.2, 4.3, p, WALL_H, 0, [
-                {"c": -2 + 4.3, "w": 1.1, "y0": 0, "y1": 2.15},
-                {"c": 2 + 4.3, "w": 1.1, "y0": 0, "y1": 2.15},
+                {"c": -2 + 4, "w": 1.1, "y0": 0, "y1": 2.15},
+                {"c": 2 + 4, "w": 1.1, "y0": 0, "y1": 2.15},
         ])
         # kitchen/study divider z=-0.2
         _wall(-11, -0.2, -7.2, -0.2, p)
@@ -349,7 +349,7 @@ func _ground_walls() -> void:
         _wall(-0.5, -9, -0.5, -4.3, p)
         _wall(4.5, -9, 4.5, -4.3, p)
         # east wing (stair room) x=5.2 wall with door z=0, and side walls
-        _wall(5.2, -4, 5.2, 4.3, p, WALL_H, 0, [{"c": 2.5 + 4, "w": 1.1, "y0": 0, "y1": 2.15}])
+        _wall(5.2, -4, 5.2, 4.3, p, WALL_H, 0, [{"c": 0 + 4, "w": 1.1, "y0": 0, "y1": 2.15}])
         _wall(5.2, -2.5, 10.75, -2.5, p)
         _wall(5.2, 2.5, 10.75, 2.5, p)
 
@@ -425,9 +425,10 @@ func _pool_and_tree() -> void:
 # ================= street =================
 func _street() -> void:
         var pb: StandardMaterial3D = mats["brick"]
-        _wall(-4, 12.2, 4, 12.2, pb, 3.0, 0, [], 0.4)  # alley wall across (so street feels narrow) with gap? no gap — wall beyond the door is behind player? Actually player enters FROM street moving north; wall at z=12.2 blocks view south. Put gap? keep solid.
-        _wall(4, 9.2, 4, 12.2, pb, 3.0)
-        _wall(-4, 9.2, -4, 12.2, pb, 3.0)
+        # alley wall across with a passage gap at x=0 (spawn side connects to the main door)
+        _wall(-4, 12.2, 4, 12.2, pb, 3.0, 0, [{"c": 0 + 4, "w": 1.7, "y0": 0, "y1": 2.2}], 0.4)
+        _wall(4, 9.2, 4, 15.2, pb, 3.0)   # east alley wall (blocks void falls)
+        _wall(-4, 9.2, -4, 15.2, pb, 3.0) # west alley wall
         _box(Vector3(2.4, 0.02, 0.9), Vector3(-2.6, 0.011, 11.6), _mat("puddle", "", Vector3.ONE, 0.05, Color(0.1, 0.14, 0.18)), false)
         # wall lamp above door
         _lamp("street_lamp", Vector3(1.2, 2.4, 9.0), Color(1.0, 0.7, 0.4), 1.4, 5.0, true)

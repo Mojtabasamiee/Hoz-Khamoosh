@@ -30,7 +30,7 @@ func _ready() -> void:
         player = load("res://scripts/player/player.gd").new()
         player.name = "Player"
         add_child(player)
-        var spawn_pos: Vector3 = Vector3(0, 0.3, 12.5)
+        var spawn_pos: Vector3 = Vector3(0.4, 0.3, 2.6)   # inside the courtyard (حیات), facing the pool
         if GameState.flags.has("player_pos"):
                 var parr: Array = GameState.flags["player_pos"]
                 spawn_pos = Vector3(parr[0], parr[1], parr[2])
@@ -51,6 +51,13 @@ func _ready() -> void:
 
         EventBus.ui_open_changed.connect(_on_ui_open)
         if new_game:
+                # the story now begins INSIDE the courtyard: the main door is
+                # already behind us, so mark house/courtyard entered and lock it.
+                GameState.set_flag("entered_house")
+                GameState.set_flag("entered_court")
+                var md = house.reg.get("main_door")
+                if md != null:
+                        md.force_close_and_lock()
                 _intro()
 
 func _intro() -> void:
@@ -62,7 +69,16 @@ func _intro() -> void:
         panel.fill(str(nd["body"]), str(nd["title"]))
         get_viewport().add_child(UIH.overlay(panel))
         GameState.add_item("note_letter")
-        GameState.set_objective(Fa.OBJ["c1_enter"])
+        GameState.set_chapter(2)
+        GameState.set_objective(Fa.OBJ["c2_explore"])
+        # first beat at the silent pool (player already stands in the courtyard)
+        await get_tree().create_timer(2.0).timeout
+        _story("c2_pool")
+        house.reg["pool"].ripple_event()
+        Horror.cue_discover()
+        await get_tree().create_timer(5.0).timeout
+        house.reg["pool"].ripple_event()
+        GameState.set_objective(Fa.OBJ["c2_note"])
 
 func _ambience_start() -> void:
         AudioMgr.start_ambient("rain", "res://assets/audio/ambience/rain_loop.ogg", -10.0)

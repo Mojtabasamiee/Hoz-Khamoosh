@@ -11,28 +11,33 @@ var _toast_tw: Tween
 
 func _ready() -> void:
         layer = 5
-        # crosshair
+        # crosshair (dead center — offsets, NOT position, so anchors apply)
         crosshair = ColorRect.new()
         crosshair.color = Color(1, 1, 1, 0.55)
-        crosshair.custom_minimum_size = Vector2(5, 5)
         crosshair.set_anchors_preset(Control.PRESET_CENTER)
-        crosshair.position = Vector2(-2.5, -2.5)
-        crosshair.size = Vector2(5, 5)
+        crosshair.offset_left = -2.5
+        crosshair.offset_top = -2.5
+        crosshair.offset_right = 2.5
+        crosshair.offset_bottom = 2.5
         add_child(crosshair)
 
-        # interaction prompt (bottom center)
+        # interaction prompt (bottom center, above the action buttons row)
         prompt_label = UIH.centered_label("", 24, Color(0.95, 0.97, 0.9), true)
         prompt_label.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-        prompt_label.position = Vector2(-260, -150)
-        prompt_label.size = Vector2(520, 44)
+        prompt_label.offset_left = -300
+        prompt_label.offset_right = 300
+        prompt_label.offset_top = -204
+        prompt_label.offset_bottom = -158
         prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         add_child(prompt_label)
 
-        # objective (top right)
+        # objective (top right, left of the inventory icon)
         objective_label = UIH.label("", 20, Color(0.75, 0.9, 0.92))
         objective_label.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-        objective_label.position = Vector2(-520, 18)
-        objective_label.size = Vector2(500, 60)
+        objective_label.offset_left = -580
+        objective_label.offset_right = -130
+        objective_label.offset_top = 18
+        objective_label.offset_bottom = 78
         objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
         objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
         add_child(objective_label)
@@ -40,18 +45,20 @@ func _ready() -> void:
         # toast (upper center)
         toast_label = UIH.centered_label("", 22, Color(0.95, 0.9, 0.75))
         toast_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
-        toast_label.position = Vector2(-420, 110)
-        toast_label.size = Vector2(840, 70)
+        toast_label.offset_left = -420
+        toast_label.offset_right = 420
+        toast_label.offset_top = 108
+        toast_label.offset_bottom = 178
         toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
         toast_label.modulate.a = 0.0
         add_child(toast_label)
 
-        # battery bar (top left, hidden)
+        # battery bar (top left, below the pause icon, hidden)
         battery = ProgressBar.new()
         battery.custom_minimum_size = Vector2(150, 12)
         battery.set_anchors_preset(Control.PRESET_TOP_LEFT)
-        battery.position = Vector2(24, 24)
+        battery.position = Vector2(24, 102)
         battery.min_value = 0
         battery.max_value = 100
         battery.value = 100

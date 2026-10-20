@@ -35,40 +35,49 @@ func _ready() -> void:
         vb.add_child(UIH.vspace(4))
         vb.add_child(_sep())
 
-        # look sensitivity
-        var sens_row := HBoxContainer.new()
-        var sens_label := UIH.label(Fa.UI["sensitivity"], 20)
-        sens_row.add_child(sens_label)
-        var sens_val := UIH.label("1.0", 18, UIH.COL_ACCENT)
-        var sens := HSlider.new()
-        sens.min_value = 0.3
-        sens.max_value = 3.0
-        sens.step = 0.05
-        sens.value = float(AudioMgr.get_setting("sensitivity", 1.0))
-        sens.custom_minimum_size = Vector2(220, 24)
-        sens.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-        sens.value_changed.connect(func(v):
-                AudioMgr.set_setting("sensitivity", v)
-                sens_val.text = "%.2f" % v)
-        _sliders["sensitivity"] = sens
-        sens_row.add_child(sens)
-        sens_row.add_child(sens_val)
-        vb.add_child(sens_row)
+        # look sensitivity (mouse — desktop only; touch devices use the touch slider)
+        if not OS.has_feature("android"):
+                var sens_row := HBoxContainer.new()
+                var sens_label := UIH.label(Fa.UI["sensitivity"], 20)
+                sens_row.add_child(sens_label)
+                var cur_sens := float(AudioMgr.get_setting("sensitivity", 1.0))
+                var sens_val := UIH.label("%.2f" % cur_sens, 18, UIH.COL_ACCENT)
+                var sens := HSlider.new()
+                sens.min_value = 0.2
+                sens.max_value = 2.0
+                sens.step = 0.05
+                sens.value = cur_sens
+                sens.custom_minimum_size = Vector2(220, 24)
+                sens.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+                sens.value_changed.connect(func(v):
+                        AudioMgr.set_setting("sensitivity", v)
+                        sens_val.text = "%.2f" % v
+                        var pl := get_tree().get_first_node_in_group("player")
+                        if pl != null:
+                                pl.set("mouse_sens", v))
+                _sliders["sensitivity"] = sens
+                sens_row.add_child(sens)
+                sens_row.add_child(sens_val)
+                vb.add_child(sens_row)
 
-        # touch sensitivity
+        # touch sensitivity (soft by default — reduced after play-test feedback)
         var trow := HBoxContainer.new()
         trow.add_child(UIH.label(Fa.UI["touch_sens"], 20))
-        var tval := UIH.label("1.0", 18, UIH.COL_ACCENT)
+        var cur_tsens := float(AudioMgr.get_setting("touch_sens", 0.4))
+        var tval := UIH.label("%.2f" % cur_tsens, 18, UIH.COL_ACCENT)
         var tsens := HSlider.new()
-        tsens.min_value = 0.4
-        tsens.max_value = 2.5
+        tsens.min_value = 0.15
+        tsens.max_value = 1.5
         tsens.step = 0.05
-        tsens.value = float(AudioMgr.get_setting("touch_sens", 1.0))
+        tsens.value = cur_tsens
         tsens.custom_minimum_size = Vector2(220, 24)
         tsens.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         tsens.value_changed.connect(func(v):
                 AudioMgr.set_setting("touch_sens", v)
-                tval.text = "%.2f" % v)
+                tval.text = "%.2f" % v
+                var pl := get_tree().get_first_node_in_group("player")
+                if pl != null:
+                        pl.set("touch_sens", v))
         trow.add_child(tsens)
         trow.add_child(tval)
         vb.add_child(trow)

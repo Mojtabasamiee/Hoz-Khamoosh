@@ -76,7 +76,13 @@ func _initialize() -> void:
         check(touch != null, "TouchUI created (force_touch=true)")
         check(game.get("hud") != null, "HUD created")
         check(game.get("house") != null and game.get("house").get_child_count() > 10, "house built (%d children)" % (game.get("house").get_child_count() if game.get("house") else 0))
-        for i in 30:
+        # new game must start INSIDE the courtyard (حیات)
+        for i in 10:
+                await physics_frame
+        var sp: Vector3 = player.global_position
+        check(sp.x > -5.0 and sp.x < 5.0 and sp.z > -4.0 and sp.z < 4.3,
+                "spawn is inside the courtyard (got %s)" % str(sp))
+        for i in 20:
                 await physics_frame
 
         # ---------- 2b. intro letter overlay opens, then we close it ----------
@@ -124,6 +130,31 @@ func _initialize() -> void:
         else:
                 check(false, "buttons off-screen: " + ", ".join(offscreen))
         check(touch.get("joy_base") != null and touch.get("joy_base").visible, "joystick visible at rest")
+        # fixed stick: base must sit at the rest position (bottom-left)
+        if touch.get("joy_base") != null:
+                var jb: Control = touch.get("joy_base")
+                var rest: Vector2 = touch.call("_rest_center") - Vector2(118, 118)
+                check(jb.position.distance_to(rest) < 2.0, "joystick pinned at rest (bottom-left) @%s" % str(jb.position))
+
+        # ---------- 3b. HUD elements on-screen ----------
+        print("\n[3b] HUD geometry (crosshair/prompt/objective/toast)")
+        var hud_node: CanvasLayer = game.get("hud")
+        var hud_bad: Array[String] = []
+        for c in hud_node.get_children():
+                if c is Control:
+                        var r2: Rect2 = c.get_global_rect()
+                        var on: bool = r2.position.x > -60.0 and r2.position.y > -60.0 \
+                                and r2.position.x < vp_w - 5.0 and r2.position.y < vp_h - 5.0 \
+                                and r2.end.x > 5.0 and r2.end.y > 5.0
+                        if not on:
+                                hud_bad.append("%s @%s" % [c.name, str(r2.position)])
+        if hud_bad.is_empty():
+                check(true, "all HUD controls on-screen")
+        else:
+                check(false, "HUD controls misplaced: " + ", ".join(hud_bad))
+        var ch_rect: Rect2 = hud_node.get("crosshair").get_global_rect()
+        var center_ok: bool = absf(ch_rect.get_center().x - vp_w / 2.0) < 4.0 and absf(ch_rect.get_center().y - vp_h / 2.0) < 4.0
+        check(center_ok, "crosshair dead-center (got %s)" % str(ch_rect.get_center()))
 
         # ---------- 4. touch walk via floating joystick ----------
         print("\n[4] Touch walk (floating joystick, left zone) — scanning for an open direction")
